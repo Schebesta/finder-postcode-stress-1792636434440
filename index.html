@@ -90,7 +90,8 @@
             outline: none;
             transition: border-color .15s ease;
         }
-        #postcode::placeholder { color: #9ca3af; }
+        /* #9ca3af on white is 2.54:1; the placeholder carries the format hint. */
+        #postcode::placeholder { color: #6b7280; }
         #postcode:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; }
         #postcode[aria-invalid="true"] { border-color: #ef4444; }
 
@@ -152,6 +153,11 @@
         .region-delta { color: #dc2626; font-weight: 700; }
         .region-caption { font-size: .75rem; line-height: 1rem; color: #6b7280; }
         .region.is-hit { border-color: #ef4444; background: #fef2f2; }
+        /* The red highlight darkens the backdrop: #6b7280 drops to 4.42:1 and
+           #dc2626 to 4.41:1, both under AA. Darken them for the hit state. */
+        .region.is-hit .region-sub,
+        .region.is-hit .region-caption { color: #4b5563; }
+        .region.is-hit .region-delta { color: #b91c1c; }
 
         .offer {
             margin-top: 2.5rem;
