@@ -1,73 +1,310 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="Check if your postcode is showing mortgage stress. ABS regional jobless data for Australian suburbs, plus refinancing options.">
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text x='50' y='72' font-size='64' font-family='sans-serif' font-style='italic' font-weight='bold' fill='white' text-anchor='middle'>f</text></svg>">
     <title>Finder Postcode Stress Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html {
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        body {
+            margin: 0;
+            background: #f9fafb;
+            color: #111827;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        h1, h2, h3, h4, p { margin: 0; font-size: inherit; font-weight: inherit; }
+        button, input { font: inherit; color: inherit; margin: 0; }
+        svg { display: block; flex: none; }
+
+        .shell {
+            max-width: 28rem;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+            min-height: 100dvh;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+        }
+
+        .masthead {
+            background: #2563eb;
+            color: #fff;
+            text-align: center;
+            padding: 1.5rem;
+            padding-top: max(1.5rem, env(safe-area-inset-top));
+        }
+        .wordmark {
+            font-size: 1.5rem;
+            line-height: 2rem;
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: -0.025em;
+        }
+        .wordmark span { color: #bfdbfe; }
+        .tagline { font-size: .875rem; line-height: 1.25rem; color: #eff6ff; margin-top: .25rem; }
+
+        .body-wrap { padding: 1.5rem; padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+
+        .alert {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .alert h2 {
+            color: #991b1b;
+            font-weight: 700;
+            display: flex;
+            align-items: flex-start;
+            gap: .5rem;
+        }
+        .alert h2 svg { margin-top: .25rem; }
+        .alert p { color: #b91c1c; font-size: .875rem; line-height: 1.25rem; margin-top: .25rem; }
+
+        .lookup { margin-bottom: 2rem; }
+        .lookup label {
+            display: block;
+            font-size: .875rem;
+            line-height: 1.25rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: .5rem;
+            text-transform: uppercase;
+        }
+        .lookup form { display: flex; gap: .5rem; }
+        #postcode {
+            flex: 1 1 0%;
+            min-width: 0;
+            border: 2px solid #e5e7eb;
+            border-radius: .5rem;
+            padding: .75rem 1rem;
+            outline: none;
+            transition: border-color .15s ease;
+        }
+        #postcode::placeholder { color: #9ca3af; }
+        #postcode:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; }
+        #postcode[aria-invalid="true"] { border-color: #ef4444; }
+
+        .go {
+            background: #2563eb;
+            color: #fff;
+            padding: .75rem 1.5rem;
+            border: 0;
+            border-radius: .5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color .15s ease;
+        }
+        .go:hover { background: #1d4ed8; }
+        .go:active { background: #1e40af; }
+
+        :where(.go, .cta):focus-visible {
+            outline: 2px solid transparent;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2563eb;
+        }
+        .cta:focus-visible { box-shadow: 0 0 0 2px #1e3a8a, 0 0 0 4px #fff; }
+
+        .result {
+            margin-top: .75rem;
+            padding: .75rem 1rem;
+            border-radius: .5rem;
+            font-size: .875rem;
+            line-height: 1.25rem;
+        }
+        .result:empty { display: none; }
+        .result strong { display: block; font-size: 1rem; }
+        .result.is-risk { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .result.is-clear { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .result.is-error { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+        .regions h3 {
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .regions h3 svg { color: #2563eb; }
+        .region-list { display: flex; flex-direction: column; gap: 1rem; }
+        .region {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: .75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: .5rem;
+            background: #f9fafb;
+        }
+        .region-name { font-weight: 700; color: #111827; }
+        .region-sub { font-size: .75rem; line-height: 1rem; color: #6b7280; }
+        .region-figure { text-align: right; }
+        .region-delta { color: #dc2626; font-weight: 700; }
+        .region-caption { font-size: .75rem; line-height: 1rem; color: #6b7280; }
+        .region.is-hit { border-color: #ef4444; background: #fef2f2; }
+
+        .offer {
+            margin-top: 2.5rem;
+            padding: 1.5rem;
+            background: #1e3a8a;
+            border-radius: 1rem;
+            color: #fff;
+        }
+        .offer h4 { font-weight: 700; font-size: 1.125rem; line-height: 1.75rem; margin-bottom: .5rem; }
+        .offer p { font-size: .875rem; line-height: 1.25rem; color: #dbeafe; margin-bottom: 1rem; }
+        .cta {
+            display: block;
+            background: #fff;
+            color: #1e3a8a;
+            text-align: center;
+            padding: .75rem;
+            border-radius: .75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .025em;
+            text-decoration: none;
+            transition: background-color .15s ease;
+        }
+        .cta:hover { background: #eff6ff; }
+        .cta:active { background: #dbeafe; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+        }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-900">
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg">
-        <header class="bg-blue-600 p-6 text-white text-center">
-            <h1 class="text-2xl font-bold italic tracking-tight">finder<span class="text-blue-200">.</span></h1>
-            <p class="text-sm text-blue-50 mt-1">Market Opportunity Sniper</p>
+<body>
+    <div class="shell">
+        <header class="masthead">
+            <h1 class="wordmark">finder<span>.</span></h1>
+            <p class="tagline">Market Opportunity Sniper</p>
         </header>
 
-        <main class="p-6">
-            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-                <h2 class="text-red-800 font-bold flex items-start">
-                    <i class="fas fa-exclamation-triangle mr-2 mt-1 shrink-0" aria-hidden="true"></i> NEW: Postcode Stress Alert
+        <main class="body-wrap">
+            <div class="alert">
+                <h2>
+                    <svg width="16" height="16" viewBox="0 0 576 512" fill="currentColor" aria-hidden="true"><path d="M569.5 440C588 472 564.8 512 527.9 512H48.1c-36.9 0-60-40.1-41.6-72L246.4 24c18.5-32 64.7-32 83.2 0l239.9 416zM288 354c-25.4 0-46 20.6-46 46s20.6 46 46 46 46-20.6 46-46-20.6-46-46-46zm-43.7-165.3l7.4 136c.3 6.4 5.6 11.3 12 11.3h48.6c6.4 0 11.6-4.9 12-11.3l7.4-136c.4-6.9-5.1-12.7-12-12.7h-63.4c-6.9 0-12.4 5.8-12 12.7z"/></svg>
+                    NEW: Postcode Stress Alert
                 </h2>
-                <p class="text-red-700 text-sm mt-1">ABS Regional data (Oct '26) confirms a 1.2% jobless spike in key mortgage belts.</p>
+                <p>ABS Regional data (Oct '26) confirms a 1.2% jobless spike in key mortgage belts.</p>
             </div>
 
-            <section class="mb-8">
-                <label for="postcode" class="block text-sm font-semibold text-gray-600 mb-2 uppercase">Check your postcode</label>
-                <form class="flex gap-2" onsubmit="event.preventDefault()">
-                    <input id="postcode" name="postcode" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="postal-code" placeholder="e.g. 2750" class="flex-1 min-w-0 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors">GO</button>
+            <section class="lookup">
+                <label for="postcode">Check your postcode</label>
+                <form id="postcode-form" novalidate>
+                    <input id="postcode" name="postcode" type="text" inputmode="numeric" pattern="[0-9]{4}"
+                           maxlength="4" autocomplete="postal-code" enterkeyhint="search" required
+                           placeholder="e.g. 2750" aria-describedby="postcode-result">
+                    <button type="submit" class="go">GO</button>
                 </form>
+                <p id="postcode-result" class="result" role="status" aria-live="polite"></p>
             </section>
 
-            <section>
-                <h3 class="font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-chart-line mr-2 text-blue-600" aria-hidden="true"></i> Top At-Risk Regions
+            <section class="regions">
+                <h3>
+                    <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64V400c0 44.2 35.8 80 80 80H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16V64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/></svg>
+                    Top At-Risk Regions
                 </h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center gap-3 p-3 border rounded-lg bg-gray-50">
+                <div class="region-list">
+                    <div class="region" data-postcode="2750">
                         <div>
-                            <span class="font-bold text-gray-900">Penrith (2750)</span>
-                            <p class="text-xs text-gray-500">Outer Sydney</p>
+                            <span class="region-name">Penrith (2750)</span>
+                            <p class="region-sub">Outer Sydney</p>
                         </div>
-                        <div class="text-right">
-                            <span class="text-red-600 font-bold">+0.8%</span>
-                            <p class="text-xs text-gray-500">Jobless Change</p>
+                        <div class="region-figure">
+                            <span class="region-delta">+0.8%</span>
+                            <p class="region-caption">Jobless Change</p>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center gap-3 p-3 border rounded-lg bg-gray-50">
-                         <div>
-                            <span class="font-bold text-gray-900">Logan (4114)</span>
-                            <p class="text-xs text-gray-500">South Brisbane</p>
+                    <div class="region" data-postcode="4114">
+                        <div>
+                            <span class="region-name">Logan (4114)</span>
+                            <p class="region-sub">South Brisbane</p>
                         </div>
-                        <div class="text-right">
-                            <span class="text-red-600 font-bold">+1.1%</span>
-                            <p class="text-xs text-gray-500">Jobless Change</p>
+                        <div class="region-figure">
+                            <span class="region-delta">+1.1%</span>
+                            <p class="region-caption">Jobless Change</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <div class="mt-10 p-6 bg-blue-900 rounded-2xl text-white">
-                <h4 class="font-bold text-lg mb-2">Beat the Stress</h4>
-                <p class="text-sm text-blue-100 mb-4">Postcodes with rising unemployment are seeing a surge in mortgage refinancing. Don't wait.</p>
-                <a href="#" class="block bg-white text-blue-900 text-center py-3 rounded-xl font-extrabold uppercase tracking-wide hover:bg-blue-50 active:bg-blue-100 focus-visible:ring-2 focus-visible:ring-white transition-colors">Compare Rates</a>
+            <div class="offer">
+                <h4>Beat the Stress</h4>
+                <p>Postcodes with rising unemployment are seeing a surge in mortgage refinancing. Don't wait.</p>
+                <a class="cta" href="https://www.finder.com.au/home-loans/refinancing-home-loans">Compare Rates</a>
             </div>
         </main>
     </div>
+
+    <script>
+        (function () {
+            var form = document.getElementById('postcode-form');
+            var input = document.getElementById('postcode');
+            var result = document.getElementById('postcode-result');
+            var regions = Array.prototype.slice.call(document.querySelectorAll('.region'));
+
+            function show(state, html) {
+                result.className = 'result is-' + state;
+                result.innerHTML = html;
+            }
+
+            function highlight(postcode) {
+                regions.forEach(function (row) {
+                    row.classList.toggle('is-hit', row.dataset.postcode === postcode);
+                });
+            }
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                var value = input.value.trim();
+
+                if (!/^[0-9]{4}$/.test(value)) {
+                    input.setAttribute('aria-invalid', 'true');
+                    highlight(null);
+                    show('error', 'Enter a 4-digit Australian postcode, like 2750.');
+                    input.focus();
+                    return;
+                }
+
+                input.removeAttribute('aria-invalid');
+                highlight(value);
+
+                var match = regions.filter(function (row) {
+                    return row.dataset.postcode === value;
+                })[0];
+
+                if (match) {
+                    show('risk',
+                        '<strong>' + match.querySelector('.region-name').textContent + ' is on the at-risk list.</strong>' +
+                        'Jobless change ' + match.querySelector('.region-delta').textContent + '. See refinancing options below.');
+                } else {
+                    show('clear',
+                        '<strong>' + value + ' is not on the current at-risk list.</strong>' +
+                        'We only track the regions shown below. Refinancing may still save you money.');
+                }
+            });
+
+            input.addEventListener('input', function () {
+                input.value = input.value.replace(/\D/g, '').slice(0, 4);
+                input.removeAttribute('aria-invalid');
+                if (result.className !== 'result') {
+                    result.className = 'result';
+                    result.innerHTML = '';
+                    highlight(null);
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
