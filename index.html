@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Check if your postcode is showing mortgage stress. ABS regional jobless data for Australian suburbs, plus refinancing options.">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text x='50' y='72' font-size='64' font-family='sans-serif' font-style='italic' font-weight='bold' fill='white' text-anchor='middle'>f</text></svg>">
     <title>Finder Postcode Stress Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -18,22 +21,22 @@
         <main class="p-6">
             <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                 <h2 class="text-red-800 font-bold flex items-center">
-                    <i class="fas fa-exclamation-triangle mr-2"></i> NEW: Postcode Stress Alert
+                    <i class="fas fa-exclamation-triangle mr-2" aria-hidden="true"></i> NEW: Postcode Stress Alert
                 </h2>
                 <p class="text-red-700 text-sm mt-1">ABS Regional data (Oct '26) confirms a 1.2% jobless spike in key mortgage belts.</p>
             </div>
 
             <section class="mb-8">
-                <label class="block text-sm font-semibold text-gray-600 mb-2 uppercase">Check your postcode</label>
-                <div class="flex gap-2">
-                    <input type="text" placeholder="e.g. 2750" class="flex-1 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 outline-none transition-all">
-                    <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors">GO</button>
-                </div>
+                <label for="postcode" class="block text-sm font-semibold text-gray-600 mb-2 uppercase">Check your postcode</label>
+                <form class="flex gap-2" onsubmit="event.preventDefault()">
+                    <input id="postcode" name="postcode" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="postal-code" placeholder="e.g. 2750" class="flex-1 min-w-0 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 outline-none transition-all">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors">GO</button>
+                </form>
             </section>
 
             <section>
                 <h3 class="font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-chart-line mr-2 text-blue-600"></i> Top At-Risk Regions
+                    <i class="fas fa-chart-line mr-2 text-blue-600" aria-hidden="true"></i> Top At-Risk Regions
                 </h3>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
@@ -46,7 +49,7 @@
                             <p class="text-[10px] text-gray-400">Jobless Change</p>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center p-3 border rounded-lg bg-gray-50 opacity-80">
+                    <div class="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
                          <div>
                             <span class="font-bold text-gray-900">Logan (4114)</span>
                             <p class="text-xs text-gray-500">South Brisbane</p>
@@ -62,7 +65,7 @@
             <div class="mt-10 p-6 bg-blue-900 rounded-2xl text-white">
                 <h4 class="font-bold text-lg mb-2">Beat the Stress</h4>
                 <p class="text-sm text-blue-100 mb-4">Postcodes with rising unemployment are seeing a surge in mortgage refinancing. Don't wait.</p>
-                <a href="#" class="block bg-white text-blue-900 text-center py-3 rounded-xl font-extrabold uppercase tracking-wide">Compare Rates</a>
+                <a href="#" class="block bg-white text-blue-900 text-center py-3 rounded-xl font-extrabold uppercase tracking-wide hover:bg-blue-50 active:bg-blue-100 focus-visible:ring-2 focus-visible:ring-white transition-colors">Compare Rates</a>
             </div>
         </main>
     </div>
